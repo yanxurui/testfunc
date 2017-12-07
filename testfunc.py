@@ -11,7 +11,7 @@ from traceback import print_exc
 
 from texttable import Texttable
 
-logging.basicConfig(format='[%(levelname)s] %(message)s')
+logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
 class _bcolors:
     OKGREEN = '\033[92m'
@@ -34,7 +34,7 @@ def _print():
     if _total == 0:
         print(_bcolors.WARNING + u'0 test' + _bcolors.ENDC)
     elif _fail + _error == 0 :
-        print('all %d test(s) passed' % _total)
+        print('%d test(s) passed' % _total)
     else:
         print('total:%d, passed:%d, fail:%d, error:%d' % (_total, _total - _fail - _error, _fail, _error))
 
@@ -87,6 +87,7 @@ def test(func, in_and_out, summary=None, unpack=True):
         arg_str = dump_args(*arg, **kw)
         call = "%s(%s)" % (func.__name__, arg_str)
         row.append(call)
+        logging.info(call)
         start = time()
         try:
             result = func(*arg, **kw)

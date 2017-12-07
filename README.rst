@@ -9,6 +9,10 @@ a simple parametrized test tool for function
 example
 -------
 
+.. code:: sh
+
+    pip install testfunc
+
 .. code:: python
 
     from testfunc import test
