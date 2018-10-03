@@ -47,7 +47,7 @@ _error = 0
 
 
 def dump_args(*args, **kw):
-    return ', '.join(map(repr, args) + ["%s=%s"%(str(k), repr(v)) for k,v in kw.items()])
+    return ', '.join(list(map(repr, args)) + ["%s=%s"%(str(k), repr(v)) for k,v in kw.items()])
 
 def test(func, in_and_out, summary=None, unpack=True):
     """call a function and assert its return value 
