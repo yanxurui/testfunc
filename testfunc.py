@@ -49,7 +49,7 @@ _error = 0
 def dump_args(*args, **kw):
     return ', '.join(list(map(repr, args)) + ["%s=%s"%(str(k), repr(v)) for k,v in kw.items()])
 
-def test(func, in_and_out, summary=None, unpack=True):
+def test(func, in_and_out, summary=None, unpack=True, compare=None):
     """call a function and assert its return value 
 
     func can take arbitrary arguments
@@ -61,11 +61,12 @@ def test(func, in_and_out, summary=None, unpack=True):
                 if args is a tuple and unpack is True, then func will be invoked as func(*args) otherwise as func(args)
                 so if func takes only a tuple, then set unpack to False
             kw {dict, optional} -- keywords arguments passed to func
-            expected {a single value or a tuple} -- expected valued returned from func
+            expected {a single value or a tuple} -- expected value returned from func
 
     Keyword Arguments:
             summary {str} -- summary to display (default: None)
             unpack {boolean} -- whether to unpack tuple arguments (default: True)
+            compare {function} -- the function used to compare the output and expected
     """
 
     global _total, _fail, _error
@@ -98,12 +99,17 @@ def test(func, in_and_out, summary=None, unpack=True):
             continue
         t = time() - start
         row.append(t)
-        row.append(result)
-        if result == exp:
+        if compare is not None:
+            correct = compare(exp, result)
+        else:
+            correct = result == exp
+        if correct:
             row.append('')
+            row.append(exp)
             row.append("√")
         else:
             _fail += 1
+            row.append(result)
             row.append(exp)
             row.append("×")
         _table.add_row(row)
@@ -220,8 +226,8 @@ if __name__ == '__main__':
     )
 
 
-    def bar(**kw):
-        return 'kw = %s' % (args, kw)
+    def bar(*args, **kw):
+        return 'args = %s kw = %s' % (args, kw)
 
     # empty args
     test(bar,
@@ -232,4 +238,14 @@ if __name__ == '__main__':
                 "args = () kw = {'x': 99}"
             )
         ]
+    )
+
+    test(lambda x: x,
+        [
+            (
+                [1,2],
+                [2,1]
+            )
+        ],
+        compare=lambda a,b: sorted(a)==sorted(b)
     )
