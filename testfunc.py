@@ -49,6 +49,11 @@ _error = 0
 def dump_args(*args, **kw):
     return ', '.join(list(map(repr, args)) + ["%s=%s"%(str(k), repr(v)) for k,v in kw.items()])
 
+def truncate(s, l=50):
+    if not isinstance(s, ("".__class__, u"".__class__)):
+        return s
+    return s if len(s) <= l else s[:l] + '...'
+
 def test(func, in_and_out, summary=None, unpack=True, compare=None):
     """call a function and assert its return value 
 
@@ -86,7 +91,7 @@ def test(func, in_and_out, summary=None, unpack=True, compare=None):
         if not (type(arg) is tuple and unpack):
             arg = (arg,)
         arg_str = dump_args(*arg, **kw)
-        call = "%s(%s)" % (func.__name__, arg_str)
+        call = "%s(%s)" % (func.__name__, truncate(arg_str))
         row.append(call)
         logging.info(call)
         start = time()
@@ -105,12 +110,12 @@ def test(func, in_and_out, summary=None, unpack=True, compare=None):
             correct = result == exp
         if correct:
             row.append('')
-            row.append(exp)
+            row.append(truncate(exp))
             row.append("√")
         else:
             _fail += 1
-            row.append(result)
-            row.append(exp)
+            row.append(truncate(result))
+            row.append(truncate(exp))
             row.append("×")
         _table.add_row(row)
 
